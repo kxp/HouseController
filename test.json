@@ -1,0 +1,36 @@
+ {
+ 	"AlarmTime": "02:00:00",
+ 	"SelectedDays": [
+ 	  {
+ 			"Weekday": 0,
+ 			"Active": false
+ 		},
+ 		{
+ 			"Weekday": 1,
+
+ 			"Active": false
+ 		},
+ 		{
+ 			"Weekday": 2,
+ 			"Active": false
+ 		},
+
+ 		{
+ 			"Weekday": 3,
+ 			"Active": false
+ 		},
+ 		{
+ 			"Weekday": 4,
+ 			"Active": true
+ 		},
+ 		{
+ 			"Weekday": 5,
+ 			"Active": false
+ 		},
+ 		{
+ 			"Weekday": 6,
+ 			"Active": false
+ 		}
+ 	],
+ "LightColor": 4
+}
