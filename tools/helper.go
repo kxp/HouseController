@@ -6,7 +6,7 @@ https://github.com/GoldenCheetah/GoldenCheetah/wiki/Allowing-your-linux-userid-p
 DO NOT RUN A WEBSERVER AS ROOT!
 */
 
-package helper
+package tools
 
 import (
 	"errors"

@@ -1,18 +1,19 @@
 package main
 
 import (
+	"HouseController/serverhandler"
+	"HouseController/tools"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
-	//"encoding/json"
-	"HouseController/helper"
-	"HouseController/serverhandler"
 )
 
+// muxer for the hhtp server, its a blobal
 var mux map[string]func(http.ResponseWriter, *http.Request)
 
-func main() {
+func ConfigServer() (*http.Server, error) {
 
 	fmt.Printf("Current Unix Time: %v\n", time.Now().Unix())
 	server := http.Server{
@@ -20,19 +21,39 @@ func main() {
 		Handler: &myHandler{},
 	}
 
-	fmt.Println("opening...")
-	var serialPort helper.SerialPort
-
-	serialPort = &helper.Tty{}
-
-	serialPort.Open("test")
-	serialPort.Close()
-
 	mux = make(map[string]func(http.ResponseWriter, *http.Request))
 	mux["/"] = serverhandler.Hello
 	mux["/alarm"] = serverhandler.Alarm
 	mux["/light"] = serverhandler.Light
-	server.ListenAndServe()
+
+	return &server, nil
+}
+
+func OpenSerial() (*tools.Tty, error) {
+
+	fmt.Println("opening...")
+	var serialPort tools.SerialPort
+
+	serialPort = &tools.Tty{}
+
+	serialPort.Open("test")
+	serialPort.Close()
+
+	return nil, nil
+}
+
+func main() {
+
+	var settings = tools.LoadConfiguration("configs.json")
+
+	httpServer, err := ConfigServer()
+	if err != nil {
+		log.Fatalf("Fail to open the HTTP server: %v", err)
+		return
+	}
+	//Blocking call
+	httpServer.ListenAndServe()
+
 }
 
 type myHandler struct{}
