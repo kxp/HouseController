@@ -6,16 +6,17 @@ https://github.com/GoldenCheetah/GoldenCheetah/wiki/Allowing-your-linux-userid-p
 DO NOT RUN A WEBSERVER AS ROOT!
 */
 
-package serialhandler
+package serialport
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"log"
 
 	"github.com/jacobsa/go-serial/serial"
 )
+
+// this class should be a singleton
 
 type SerialPort interface {
 	Open(string) error
@@ -35,7 +36,7 @@ func (internalHandler *Tty) Open(portName string) error {
 
 	// Set up options.
 	options := serial.OpenOptions{
-		PortName:        "/dev/ttyUSB0",
+		PortName:        portName,
 		BaudRate:        9600,
 		DataBits:        8,
 		StopBits:        1,
@@ -45,12 +46,10 @@ func (internalHandler *Tty) Open(portName string) error {
 	// Open the port.
 	port, err := serial.Open(options)
 	if err != nil {
-		log.Fatalf("serial.Open: %v", err)
+		log.Fatalf("Port name: %s. Error while openning: %v", portName, err)
 		return err
 	}
-
 	internalHandler.PortHandler = port
-	fmt.Println("Port openned ", portName)
 
 	return nil
 }
@@ -64,18 +63,9 @@ func (internalHandler *Tty) Close() error {
 	// Make sure to close it later.
 	defer internalHandler.PortHandler.Close()
 	internalHandler.PortHandler = nil
-	// Write 4 bytes to the port.
-	//b := []byte{0x00, 0x01, 0x02, 0x03}
-	//n, err := port.Write(b)
-	//if err != nil {
-	//log.Fatalf("port.Write: %v", err)
-	//return err
-	//}
+	log.Println("Serial port Closed")
 
-	fmt.Println("Inside close")
-	//fmt.Println("Wrote", n, "bytes.")
 	return nil
-
 }
 
 // WriteBytes write the provided arry into the serial port

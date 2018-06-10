@@ -14,51 +14,48 @@ import (
 // muxer for the hhtp server, its a blobal
 var mux map[string]func(http.ResponseWriter, *http.Request)
 
-func ConfigServer() (*http.Server, error) {
+// Hello function only exists for debug
+func Hello(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "Hello world!")
+	fmt.Println("we arrive on hello")
+}
+
+func ConfigServer(settings tools.Config) (*http.Server, error) {
 
 	fmt.Printf("Current Unix Time: %v\n", time.Now().Unix())
 	server := http.Server{
-		Addr:    ":8000",
+		Addr:    settings.HttpPort,
 		Handler: &myHandler{},
 	}
 
 	mux = make(map[string]func(http.ResponseWriter, *http.Request))
-	mux["/"] = alarm.Hello
+	mux["/"] = Hello
 	mux["/alarm"] = alarm.Alarm
-	mux["/light"] = light.Light
+	mux["/light"] = light.GetInstance().Light //light.Light
 
 	return &server, nil
 }
 
-func OpenSerial() (*tools.Tty, error) {
-
-	fmt.Println("opening...")
-	var serialPort tools.SerialPort
-
-	serialPort = &tools.Tty{}
-
-	serialPort.Open("test")
-	serialPort.Close()
-
-	return nil, nil
-}
-
 func main() {
 
-	settings, err := tools.LoadConfiguration("configs.json")
+	instanceTools := tools.GetInstance()
+	settings, err := instanceTools.LoadConfiguration(tools.SettingsFilename)
+	if err != nil || settings == nil {
+		log.Fatalf("Fail to open settings file: %v", err)
+		return
+	}
+
+	//nitializes the  serial port
+	light.GetInstance().Initialize(settings.SerialPort)
+
+	httpServer, err := ConfigServer(*settings)
 	if err != nil {
 		log.Fatalf("Fail to open the HTTP server: %v", err)
 		return
 	}
-	log.Println(settings.HttpPort)
-	httpServer, err := ConfigServer()
-	if err != nil {
-		log.Fatalf("Fail to open the HTTP server: %v", err)
-		return
-	}
+
 	//Blocking call
 	httpServer.ListenAndServe()
-
 }
 
 type myHandler struct{}

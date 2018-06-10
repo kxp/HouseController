@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
 var results []string
 
-func Hello(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "Hello world!")
-	fmt.Println("we arrive on hello")
-}
 func Alarm(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
@@ -27,16 +24,20 @@ func Alarm(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Fprint(w, "POST done")
 	} else {
-		//http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		var alarm = generateEmptyAlarm()
-		b, err := json.Marshal(alarm)
+		instanceTools := tools.GetInstance()
+		alarmSetting, err := instanceTools.LoadAlarmSettings(tools.AlarmSettingsFilename)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
+			return
+		}
+
+		b, err := json.Marshal(alarmSetting)
+		if err != nil {
+			log.Println(err)
 			return
 		}
 		io.WriteString(w, string(b))
-		//io.WriteString(w, "Hello world! from alarm")
-		fmt.Println("Alarm: ", string(b))
+		log.Println("Alarm: ", string(b))
 	}
 
 }
@@ -44,18 +45,4 @@ func Alarm(w http.ResponseWriter, r *http.Request) {
 func alarmProcess() (string, error) {
 
 	return "", nil
-}
-
-func generateEmptyAlarm() *tools.AlarmConfig {
-
-	var alarm = new(tools.AlarmConfig)
-	alarm.SelectedDays = make([]tools.WeekDay, 7)
-	alarm.LightColor = 5
-	alarm.AlarmTime = "07:50:00"
-
-	for day := 0; day < 7; day++ {
-		alarm.SelectedDays[day].Active = false
-		alarm.SelectedDays[day].Day = day
-	}
-	return alarm
 }

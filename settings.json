@@ -1,0 +1,4 @@
+{
+    "httpPort": ":8000",
+    "serialPort": "/dev/ttyUSB0"
+}
