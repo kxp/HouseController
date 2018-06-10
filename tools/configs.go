@@ -29,6 +29,18 @@ func LoadConfiguration(file string) (Config, error) {
 	return config, nil
 }
 
+type WeekDay struct {
+	Day    int `json:"Weekday"`
+	Active bool
+}
+
+// AlarmConfig Received JSON structure From the app.
+type AlarmConfig struct {
+	AlarmTime    string
+	SelectedDays []WeekDay
+	LightColor   int32
+}
+
 func LoadAlarmSettings(file string) (Config, error) {
 	var config Config
 	configFile, err := os.Open(file)

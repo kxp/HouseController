@@ -1,7 +1,8 @@
 package main
 
 import (
-	"HouseController/serverhandler"
+	"HouseController/alarm"
+	"HouseController/light"
 	"HouseController/tools"
 	"fmt"
 	"io"
@@ -22,9 +23,9 @@ func ConfigServer() (*http.Server, error) {
 	}
 
 	mux = make(map[string]func(http.ResponseWriter, *http.Request))
-	mux["/"] = serverhandler.Hello
-	mux["/alarm"] = serverhandler.Alarm
-	mux["/light"] = serverhandler.Light
+	mux["/"] = alarm.Hello
+	mux["/alarm"] = alarm.Alarm
+	mux["/light"] = light.Light
 
 	return &server, nil
 }
@@ -44,8 +45,12 @@ func OpenSerial() (*tools.Tty, error) {
 
 func main() {
 
-	var settings = tools.LoadConfiguration("configs.json")
-
+	settings, err := tools.LoadConfiguration("configs.json")
+	if err != nil {
+		log.Fatalf("Fail to open the HTTP server: %v", err)
+		return
+	}
+	log.Println(settings.HttpPort)
 	httpServer, err := ConfigServer()
 	if err != nil {
 		log.Fatalf("Fail to open the HTTP server: %v", err)
