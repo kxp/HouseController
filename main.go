@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"time"
 	//"encoding/json"
-	"helper"
+	"HouseController/helper"
+	"HouseController/serverhandler"
 )
 
 var mux map[string]func(http.ResponseWriter, *http.Request)
@@ -28,9 +29,9 @@ func main() {
 	serialPort.Close()
 
 	mux = make(map[string]func(http.ResponseWriter, *http.Request))
-	mux["/"] = hello
-	mux["/alarm"] = Alarm
-	mux["/light"] = Light
+	mux["/"] = serverhandler.Hello
+	mux["/alarm"] = serverhandler.Alarm
+	mux["/light"] = serverhandler.Light
 	server.ListenAndServe()
 }
 

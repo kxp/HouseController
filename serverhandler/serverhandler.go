@@ -74,7 +74,7 @@ func alarmProcess() (string, error) {
 	return "", nil
 }
 
-func generateEmptyAlarm() AlarmConfig {
+func generateEmptyAlarm() *AlarmConfig {
 
 	var alarm = new(AlarmConfig)
 	alarm.SelectedDays = make([]WeekDay, 7)
